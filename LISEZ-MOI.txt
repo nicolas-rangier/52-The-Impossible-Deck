@@ -1,0 +1,4 @@
+52 – THE IMPOSSIBLE DECK V0.5
+Choisir le symbole, la valeur, puis toucher ROUGE ou BLEU pour ouvrir directement le plateau. Aucun bouton de validation.
+Le rendu du dos bleu reste provisoire.
+Test ordinateur : ouvrir index.html. Installation PWA iPhone : hébergement HTTPS requis.
