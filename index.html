@@ -81,7 +81,7 @@ h1{font-size:clamp(15px,3.6vw,22px);line-height:1.05;margin:1px 0 2px}
 #deckScreen{flex:1;min-height:0;gap:4px;justify-content:center;overflow:hidden}
 .table{width:max-content;max-width:100%;padding:var(--pad,6px);border-radius:12px;flex:0 0 auto}
 .grid{display:grid;grid-template-columns:repeat(6,var(--cw,40px));grid-template-rows:repeat(9,var(--ch,56px));gap:var(--gap,4px)}
-.card-back{width:var(--cw,40px);height:var(--ch,56px);aspect-ratio:auto;min-width:0;border:0;padding:0;border-radius:clamp(2px,1vw,5px);background:#f8f5e9 url("rider-back-red.png") center/100% 100% no-repeat;box-shadow:0 1px 4px #0007;touch-action:none;-webkit-tap-highlight-color:transparent}
+.card-back{width:var(--cw,40px);height:var(--ch,56px);aspect-ratio:auto;min-width:0;border:0;padding:0;border-radius:clamp(2px,1vw,5px);background:#f8f5e9 url("card-back-red.png") center/100% 100% no-repeat;box-shadow:0 1px 4px #0007;touch-action:none;-webkit-tap-highlight-color:transparent}
 .card-back::before,.card-back::after{content:none}
 .footer{min-height:12px;font-size:9px;line-height:12px}
 #selectScreen{min-height:0;overflow:auto}
@@ -97,11 +97,11 @@ h1{font-size:clamp(15px,3.6vw,22px);line-height:1.05;margin:1px 0 2px}
 .backs{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .back-choice{border:1px solid #937d52;background:#2d2b25;color:#f1e4c6;border-radius:8px;padding:7px;display:flex;align-items:center;justify-content:center;gap:12px;font:12px Arial;letter-spacing:1px;cursor:pointer}
 .back-choice.selected{border:2px solid #e6c47c;background:#51462f}
-.back-preview{width:32px;height:46px;border:2px solid #fff8e9;border-radius:3px;background:#a12c38 url("rider-back-red.png") center/100% 100% no-repeat;flex-shrink:0}
-.blue-preview{filter:none;background-color:#225ba2;background-image:url("rider-back-blue.png")}
+.back-preview{width:32px;height:46px;border:2px solid #fff8e9;border-radius:3px;background:#a12c38 url("card-back-red.png") center/100% 100% no-repeat;flex-shrink:0}
+.blue-preview{filter:none;background-color:#225ba2;background-image:url("card-back-blue.png")}
 #confirm{display:block;width:100%;margin-top:9px;border:1px solid #e0c080;border-radius:6px;background:#d6b473;color:#1d1b17;padding:12px;font:700 12px Arial;letter-spacing:1.3px;cursor:pointer}
 #confirm:disabled{opacity:.35;cursor:default}
-body[data-back="blue"] .card-back{background-color:#225ba2;background-image:url("rider-back-blue.png");filter:none}
+body[data-back="blue"] .card-back{background-color:#225ba2;background-image:url("card-back-blue.png");filter:none}
 @media(max-height:680px){.panel{padding:8px 12px}.panel .intro{margin-bottom:5px}.panel .step-label{margin:6px 0 5px}.suit{height:38px}.value{height:33px}.back-choice{padding:3px}.back-preview{width:23px;height:34px}#confirm{padding:8px;margin-top:6px}}
 </style></head>
 <body><main class="app" id="app">

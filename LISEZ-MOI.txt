@@ -1,5 +1,7 @@
-52 – THE IMPOSSIBLE DECK V0.7.1
-Correction des chemins des icônes : tous les fichiers sont désormais à la racine.
-Dos rouges et bleus : illustrations locales recolorisées à partir du rendu Bicycle Rider Back visible sur la capture iPhone fournie (ce ne sont pas des photographies distinctes de dos Bicycle officiels).
-L'appui prolongé et la mécanique du tour V0.7 restent inchangés.
-Sur GitHub : remplacer les fichiers existants et déposer les 2 nouveaux PNG rider-back-red.png et rider-back-blue.png. Les anciens fichiers du dossier icons peuvent rester, mais ne sont plus utilisés.
+52 – THE IMPOSSIBLE DECK V0.7.4
+
+Deux dos PNG rouge et bleu approuvés, inclus en local.
+Tous les fichiers sont à déposer à la racine du dépôt GitHub.
+Base V0.7.3, sans changement des fonctions de sélection, tirage ou accès secret.
+Cache PWA mis à jour vers v074.
+Testez sur ordinateur avant publication GitHub.
