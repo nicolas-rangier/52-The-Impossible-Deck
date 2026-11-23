@@ -55,6 +55,12 @@ h1{font-size:clamp(18px,4.5vw,25px);font-weight:normal;letter-spacing:2px;text-a
 .ace:nth-child(4){transform:translateX(15px) rotate(27deg)}
 h1{font-size:18px;margin:3px}.subtitle{margin-bottom:5px}.table{padding:6px}.grid{gap:3px}.card-back{border-width:1px}.card-back::before{inset:2px}}
 
+/* V0.7: disable native text selection/callout on enlarged card */
+#bigCard,#bigCard *,.reveal-stage,.reveal-stage *{
+ -webkit-user-select:none!important;user-select:none!important;
+ -webkit-touch-callout:none!important;-webkit-tap-highlight-color:transparent;
+ -webkit-user-drag:none;touch-action:none;
+}
 /* V0.6: prevent iOS text-selection loupe and contextual menu on secret fan. */
 #secretLogo,#secretLogo *{
   -webkit-user-select:none !important;
@@ -159,17 +165,43 @@ function updateSelection(){
 }
 document.querySelectorAll(".back-choice").forEach(b=>b.addEventListener("click",()=>{if(!selectedSuit||!selectedValue){$("selection").textContent="Choisissez d’abord le symbole et la valeur";return;}selectedBack=b.dataset.back;startGame(selectedValue+selectedSuit)}));
 function openSelection(){if(overlay.classList.contains("visible"))return;chosen=null;selectedSuit=null;selectedValue=null;selectedBack=null;phase=0;busy=false;document.querySelectorAll(".suit,.back-choice,.value").forEach(x=>x.classList.remove("selected"));$("values").replaceChildren();updateSelection();show("select")}
-function pick(i){if(busy||!chosen)return;busy=true;activeIndex=i;const card=phase===1?all.find(c=>c.label===chosen):(phase===0&&deck[i].label===chosen?deck[(i+1)%52]:deck[i]);
+function pick(i){if(busy||!chosen)return;cancelRevealPress();closing=false;busy=true;activeIndex=i;const card=phase===1?all.find(c=>c.label===chosen):(phase===0&&deck[i].label===chosen?deck[(i+1)%52]:deck[i]);
 bigCard.classList.toggle("redcard",reds.includes(card.suit));
 $("topCorner").textContent=card.label;$("bottomCorner").textContent=card.label;$("centerSuit").textContent=card.suit;
 bigCard.style.transform="";bigCard.style.opacity="";bigCard.style.transition="";
 overlay.classList.add("visible");$("footer").textContent="";phase++}
-let down=null,dragging=false;
-stage.addEventListener("pointerdown",e=>{if(!overlay.classList.contains("visible"))return;down={y:e.clientY,x:e.clientX};dragging=true;stage.setPointerCapture?.(e.pointerId)});
-stage.addEventListener("pointermove",e=>{if(!dragging||!down)return;const dy=Math.max(0,e.clientY-down.y);bigCard.style.transition="none";bigCard.style.transform=`translateY(${dy}px)`;bigCard.style.opacity=String(Math.max(.25,1-dy/500))});
-function closeReveal(){if(!overlay.classList.contains("visible"))return;dragging=false;down=null;bigCard.style.transition="transform .32s ease-in,opacity .32s ease-in";bigCard.style.transform="translateY(110vh) scale(.55) rotateY(90deg)";bigCard.style.opacity="0";setTimeout(()=>{overlay.classList.remove("visible");bigCard.style.transition="";bigCard.style.transform="";bigCard.style.opacity="";busy=false;$("footer").textContent="Touchez une carte"},330)}
-stage.addEventListener("pointerup",e=>{if(!dragging||!down)return;const dy=e.clientY-down.y;dragging=false;down=null;if(dy>65){closeReveal()}else{bigCard.style.transition="transform .22s ease,opacity .22s ease";bigCard.style.transform="";bigCard.style.opacity="1"}});
-stage.addEventListener("pointercancel",()=>{dragging=false;down=null;bigCard.style.transform="";bigCard.style.opacity="1"});
+// V0.7 — maintien 800 ms sur la grande carte pour refermer la révélation.
+// Un déplacement annule le geste ; aucun glissement n'est nécessaire.
+let revealTimer=null, revealPress=null, closing=false;
+function cancelRevealPress(){if(revealTimer!==null){clearTimeout(revealTimer);revealTimer=null}revealPress=null}
+function closeReveal(){
+ if(!overlay.classList.contains("visible")||closing)return;
+ closing=true;cancelRevealPress();
+ bigCard.style.transition="transform .38s cubic-bezier(.3,.1,.7,1),opacity .38s ease";
+ bigCard.style.transform="scale(.42) rotateY(90deg)";
+ bigCard.style.opacity="0";
+ setTimeout(()=>{
+   overlay.classList.remove("visible");bigCard.style.transition="";
+   bigCard.style.transform="";bigCard.style.opacity="";
+   busy=false;closing=false;$("footer").textContent="Touchez une carte";
+ },390);
+}
+bigCard.addEventListener("pointerdown",e=>{
+ if(!overlay.classList.contains("visible")||closing)return;
+ if(e.pointerType==="mouse"&&e.button!==0)return;
+ e.preventDefault();cancelRevealPress();
+ revealPress={id:e.pointerId,x:e.clientX,y:e.clientY};
+ revealTimer=setTimeout(()=>{revealTimer=null;closeReveal()},800);
+});
+bigCard.addEventListener("pointermove",e=>{
+ if(!revealPress||e.pointerId!==revealPress.id)return;
+ if(Math.hypot(e.clientX-revealPress.x,e.clientY-revealPress.y)>12)cancelRevealPress();
+});
+["pointerup","pointercancel","lostpointercapture","pointerleave"].forEach(t=>bigCard.addEventListener(t,cancelRevealPress));
+bigCard.addEventListener("contextmenu",e=>e.preventDefault());
+bigCard.addEventListener("selectstart",e=>e.preventDefault());
+bigCard.addEventListener("dragstart",e=>e.preventDefault());
+bigCard.addEventListener("touchstart",e=>e.preventDefault(),{passive:false});
 const logo=$("secretLogo");let timer=null,pressX=0,pressY=0;
 function cancelLongPress(){if(timer!==null){clearTimeout(timer);timer=null}}
 logo.addEventListener("pointerdown",e=>{e.preventDefault();cancelLongPress();pressX=e.clientX;pressY=e.clientY;timer=setTimeout(()=>{timer=null;openSelection()},1350)});
