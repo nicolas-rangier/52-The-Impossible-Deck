@@ -210,34 +210,31 @@ bigCard.addEventListener("contextmenu",e=>e.preventDefault());
 bigCard.addEventListener("selectstart",e=>e.preventDefault());
 bigCard.addEventListener("dragstart",e=>e.preventDefault());
 bigCard.addEventListener("touchstart",e=>e.preventDefault(),{passive:false});
-// V0.7.7 — double tap discret sur l’éventail des quatre as pour rouvrir la sélection.
-// Même seuil de temps et de déplacement que la carte agrandie.
+// V0.7.8 — gesture iPhone robuste sur le logo, independant des pointer events tactiles.
 const logo=$("secretLogo");
-let logoTapStart=null, logoPreviousTap=null;
-logo.addEventListener("pointerdown",e=>{
- if(e.pointerType==="mouse"&&e.button!==0)return;
- e.preventDefault();
- logoTapStart={id:e.pointerId,x:e.clientX,y:e.clientY,time:performance.now()};
-});
-logo.addEventListener("pointerup",e=>{
- if(!logoTapStart||logoTapStart.id!==e.pointerId)return;
- e.preventDefault();
+let logoDown=null, logoPreviousTap=null;
+function logoBegin(x,y){logoDown={x,y,time:performance.now()};}
+function logoEnd(x,y){
+ if(!logoDown)return;
  const now=performance.now();
- const valid=now-logoTapStart.time<400&&Math.hypot(e.clientX-logoTapStart.x,e.clientY-logoTapStart.y)<18;
- logoTapStart=null;
- if(!valid){logoPreviousTap=null;return}
- if(logoPreviousTap&&now-logoPreviousTap.time<=320&&Math.hypot(e.clientX-logoPreviousTap.x,e.clientY-logoPreviousTap.y)<45){
-   logoPreviousTap=null;
-   openSelection();
-   return;
+ const valid=now-logoDown.time<500&&Math.hypot(x-logoDown.x,y-logoDown.y)<22;
+ logoDown=null;
+ if(!valid){logoPreviousTap=null;return;}
+ if(logoPreviousTap&&now-logoPreviousTap.time<=420&&Math.hypot(x-logoPreviousTap.x,y-logoPreviousTap.y)<55){
+  logoPreviousTap=null;openSelection();return;
  }
- logoPreviousTap={time:now,x:e.clientX,y:e.clientY};
-});
-["pointercancel","lostpointercapture"].forEach(t=>logo.addEventListener(t,()=>{logoTapStart=null}));
+ logoPreviousTap={time:now,x,y};
+}
+// iOS Safari: use native Touch Events rather than preventing touchstart and relying on pointerup.
+logo.addEventListener("touchstart",e=>{if(e.touches.length!==1){logoDown=null;return;}const t=e.touches[0];logoBegin(t.clientX,t.clientY);},{passive:true});
+logo.addEventListener("touchend",e=>{if(e.changedTouches.length!==1)return;const t=e.changedTouches[0];e.preventDefault();logoEnd(t.clientX,t.clientY);},{passive:false});
+logo.addEventListener("touchcancel",()=>{logoDown=null;});
+// Desktop mouse: retain double-click support without double-counting synthetic touch mouse events.
+logo.addEventListener("pointerdown",e=>{if(e.pointerType!=="mouse"||e.button!==0)return;logoBegin(e.clientX,e.clientY);});
+logo.addEventListener("pointerup",e=>{if(e.pointerType!=="mouse"||e.button!==0)return;logoEnd(e.clientX,e.clientY);});
 logo.addEventListener("dblclick",e=>e.preventDefault());
 logo.addEventListener("selectstart",e=>e.preventDefault());
 logo.addEventListener("dragstart",e=>e.preventDefault());
-logo.addEventListener("touchstart",e=>e.preventDefault(),{passive:false});
 logo.addEventListener("contextmenu",e=>e.preventDefault());
 })();
 </script>

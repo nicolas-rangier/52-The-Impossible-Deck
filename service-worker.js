@@ -1,4 +1,4 @@
-const CACHE_NAME='52-impossible-deck-v077';
+const CACHE_NAME='52-impossible-deck-v078';
 const FILES=['./','./index.html','./manifest.webmanifest','./icon-180.png','./icon-192.png','./icon-512.png','./card-back-red.png','./card-back-blue.png'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE_NAME).then(c=>c.addAll(FILES)));self.skipWaiting()});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('52-impossible-deck-')&&k!==CACHE_NAME).map(k=>caches.delete(k)))));self.clients.claim()});
