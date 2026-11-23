@@ -165,18 +165,18 @@ function updateSelection(){
 }
 document.querySelectorAll(".back-choice").forEach(b=>b.addEventListener("click",()=>{if(!selectedSuit||!selectedValue){$("selection").textContent="Choisissez d’abord le symbole et la valeur";return;}selectedBack=b.dataset.back;startGame(selectedValue+selectedSuit)}));
 function openSelection(){if(overlay.classList.contains("visible"))return;chosen=null;selectedSuit=null;selectedValue=null;selectedBack=null;phase=0;busy=false;document.querySelectorAll(".suit,.back-choice,.value").forEach(x=>x.classList.remove("selected"));$("values").replaceChildren();updateSelection();show("select")}
-function pick(i){if(busy||!chosen)return;cancelRevealPress();closing=false;busy=true;activeIndex=i;const card=phase===1?all.find(c=>c.label===chosen):(phase===0&&deck[i].label===chosen?deck[(i+1)%52]:deck[i]);
+function pick(i){if(busy||!chosen)return;resetDoubleTap();closing=false;busy=true;activeIndex=i;const card=phase===1?all.find(c=>c.label===chosen):(phase===0&&deck[i].label===chosen?deck[(i+1)%52]:deck[i]);
 bigCard.classList.toggle("redcard",reds.includes(card.suit));
 $("topCorner").textContent=card.label;$("bottomCorner").textContent=card.label;$("centerSuit").textContent=card.suit;
 bigCard.style.transform="";bigCard.style.opacity="";bigCard.style.transition="";
 overlay.classList.add("visible");$("footer").textContent="";phase++}
-// V0.7 — maintien 800 ms sur la grande carte pour refermer la révélation.
-// Un déplacement annule le geste ; aucun glissement n'est nécessaire.
-let revealTimer=null, revealPress=null, closing=false;
-function cancelRevealPress(){if(revealTimer!==null){clearTimeout(revealTimer);revealTimer=null}revealPress=null}
+// V0.7.5 — deux tapotements rapides sur la carte agrandie pour la refermer.
+// Les deux gestes doivent être courts, proches et espacés de 320 ms au maximum.
+let closing=false, tapStart=null, previousTap=null;
+function resetDoubleTap(){tapStart=null;previousTap=null}
 function closeReveal(){
  if(!overlay.classList.contains("visible")||closing)return;
- closing=true;cancelRevealPress();
+ closing=true;resetDoubleTap();
  bigCard.style.transition="transform .38s cubic-bezier(.3,.1,.7,1),opacity .38s ease";
  bigCard.style.transform="scale(.42) rotateY(90deg)";
  bigCard.style.opacity="0";
@@ -189,15 +189,23 @@ function closeReveal(){
 bigCard.addEventListener("pointerdown",e=>{
  if(!overlay.classList.contains("visible")||closing)return;
  if(e.pointerType==="mouse"&&e.button!==0)return;
- e.preventDefault();cancelRevealPress();
- revealPress={id:e.pointerId,x:e.clientX,y:e.clientY};
- revealTimer=setTimeout(()=>{revealTimer=null;closeReveal()},800);
+ e.preventDefault();
+ tapStart={id:e.pointerId,x:e.clientX,y:e.clientY,time:performance.now()};
 });
-bigCard.addEventListener("pointermove",e=>{
- if(!revealPress||e.pointerId!==revealPress.id)return;
- if(Math.hypot(e.clientX-revealPress.x,e.clientY-revealPress.y)>12)cancelRevealPress();
+bigCard.addEventListener("pointerup",e=>{
+ if(!tapStart||tapStart.id!==e.pointerId||closing)return;
+ e.preventDefault();
+ const now=performance.now();
+ const valid=now-tapStart.time<400&&Math.hypot(e.clientX-tapStart.x,e.clientY-tapStart.y)<18;
+ tapStart=null;
+ if(!valid){previousTap=null;return}
+ if(previousTap&&now-previousTap.time<=320&&Math.hypot(e.clientX-previousTap.x,e.clientY-previousTap.y)<45){
+   closeReveal();return;
+ }
+ previousTap={time:now,x:e.clientX,y:e.clientY};
 });
-["pointerup","pointercancel","lostpointercapture","pointerleave"].forEach(t=>bigCard.addEventListener(t,cancelRevealPress));
+["pointercancel","lostpointercapture"].forEach(t=>bigCard.addEventListener(t,()=>{tapStart=null}));
+bigCard.addEventListener("dblclick",e=>e.preventDefault());
 bigCard.addEventListener("contextmenu",e=>e.preventDefault());
 bigCard.addEventListener("selectstart",e=>e.preventDefault());
 bigCard.addEventListener("dragstart",e=>e.preventDefault());
