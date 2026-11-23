@@ -1,4 +1,5 @@
-52 – THE IMPOSSIBLE DECK V0.5
-Choisir le symbole, la valeur, puis toucher ROUGE ou BLEU pour ouvrir directement le plateau. Aucun bouton de validation.
-Le rendu du dos bleu reste provisoire.
-Test ordinateur : ouvrir index.html. Installation PWA iPhone : hébergement HTTPS requis.
+52 – THE IMPOSSIBLE DECK V0.7.1
+Correction des chemins des icônes : tous les fichiers sont désormais à la racine.
+Dos rouges et bleus : illustrations locales recolorisées à partir du rendu Bicycle Rider Back visible sur la capture iPhone fournie (ce ne sont pas des photographies distinctes de dos Bicycle officiels).
+L'appui prolongé et la mécanique du tour V0.7 restent inchangés.
+Sur GitHub : remplacer les fichiers existants et déposer les 2 nouveaux PNG rider-back-red.png et rider-back-blue.png. Les anciens fichiers du dossier icons peuvent rester, mais ne sont plus utilisés.
