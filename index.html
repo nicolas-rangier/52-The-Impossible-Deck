@@ -55,6 +55,15 @@ h1{font-size:clamp(18px,4.5vw,25px);font-weight:normal;letter-spacing:2px;text-a
 .ace:nth-child(4){transform:translateX(15px) rotate(27deg)}
 h1{font-size:18px;margin:3px}.subtitle{margin-bottom:5px}.table{padding:6px}.grid{gap:3px}.card-back{border-width:1px}.card-back::before{inset:2px}}
 
+/* V0.6: prevent iOS text-selection loupe and contextual menu on secret fan. */
+#secretLogo,#secretLogo *{
+  -webkit-user-select:none !important;
+  user-select:none !important;
+  -webkit-touch-callout:none !important;
+  -webkit-tap-highlight-color:transparent;
+  touch-action:none;
+  -webkit-user-drag:none;
+}
 /* V0.3: viewport-safe card table, no page scrolling, authentic Rider Back image */
 html,body{width:100%;height:100%;overflow:hidden;overscroll-behavior:none}
 body{height:100dvh;min-height:0}
@@ -163,10 +172,13 @@ stage.addEventListener("pointerup",e=>{if(!dragging||!down)return;const dy=e.cli
 stage.addEventListener("pointercancel",()=>{dragging=false;down=null;bigCard.style.transform="";bigCard.style.opacity="1"});
 const logo=$("secretLogo");let timer=null,pressX=0,pressY=0;
 function cancelLongPress(){if(timer!==null){clearTimeout(timer);timer=null}}
-logo.addEventListener("pointerdown",e=>{cancelLongPress();pressX=e.clientX;pressY=e.clientY;timer=setTimeout(()=>{timer=null;openSelection()},1350)});
+logo.addEventListener("pointerdown",e=>{e.preventDefault();cancelLongPress();pressX=e.clientX;pressY=e.clientY;timer=setTimeout(()=>{timer=null;openSelection()},1350)});
+logo.addEventListener("selectstart",e=>e.preventDefault());
+logo.addEventListener("dragstart",e=>e.preventDefault());
+logo.addEventListener("touchstart",e=>e.preventDefault(),{passive:false});
 logo.addEventListener("pointermove",e=>{if(timer!==null&&Math.hypot(e.clientX-pressX,e.clientY-pressY)>10)cancelLongPress()});
 ["pointerup","pointerleave","pointercancel"].forEach(event=>logo.addEventListener(event,cancelLongPress));
-logo.addEventListener("contextmenu",e=>e.preventDefault());
+logo.addEventListener("contextmenu",e=>{e.preventDefault();cancelLongPress()});
 })();
 </script>
 <script>if("serviceWorker" in navigator && location.protocol.startsWith("http"))navigator.serviceWorker.register("./service-worker.js").catch(()=>{});</script>
